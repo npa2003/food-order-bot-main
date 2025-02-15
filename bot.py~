@@ -2,12 +2,10 @@ import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
 import os
-from base import *
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
-
 
 restaurants = [
     {"name": "Ресторан №1", "logo": "https://static.tildacdn.com/tild3937-6436-4532-b065-313439633661/E9heAba_vzEory05dBFc.jpg"},
@@ -22,8 +20,6 @@ soups = [
 current_index = 0
 current_soup_index = 0
 order = {"items": [], "total_price": 0}
-completed_orders = {}
-user_addresses = {}
 
 
 @bot.message_handler(commands=['start'])
@@ -37,7 +33,6 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: message.text == "Старт")
 def handle_start(message):
-    add_user(message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
     username = message.from_user.first_name
     text = f"Привет, {username}! Я бот, который поможет тебе заказать еду."
     inline_keyboard = InlineKeyboardMarkup()
@@ -45,10 +40,6 @@ def handle_start(message):
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(message.chat.id, text, reply_markup=inline_keyboard)
-
-@bot.message_handler(func=lambda message: message.text == "Личный кабинет")
-def profile_button_handler(message):
-    send_user_profile(message.chat.id, message.from_user.id)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -59,6 +50,8 @@ def handle_inline_buttons(call):
     if call.data == "choose_restaurant":
         current_index = 0
         send_restaurant_info(call.message.chat.id)
+    elif call.data == "profile":
+        bot.send_message(call.message.chat.id, "Личный кабинет в разработке.")
     elif call.data == "prev_restaurant":
         current_index = (current_index - 1) % len(restaurants)
         send_restaurant_info(call.message.chat.id)
@@ -84,12 +77,6 @@ def handle_inline_buttons(call):
         send_cart(call.message.chat.id)
     elif call.data == "back_to_start":
         handle_start(call.message)
-    elif call.data == "confirm_order":
-        send_payment_options(call.message.chat.id)
-    elif call.data == "pay_online":
-        process_online_payment(call.message.chat.id, call.from_user.id)
-    elif call.data == "profile":
-        send_user_profile(call.message.chat.id, call.from_user.id)
 
 
 def send_restaurant_info(chat_id):
@@ -149,38 +136,5 @@ def send_cart(chat_id):
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
-def send_payment_options(chat_id):
-    if not order["items"]:
-        bot.send_message(chat_id, "Ваша корзина пуста.")
-        return
-    text = "Ваш заказ:\n"
-    for item in order["items"]:
-        text += f"{item['name']} - {item['price']} руб.\n"
-    text += f"\nОбщая стоимость: {order['total_price']} руб."
-    text += "\nВыберите способ оплаты:"
-    inline_keyboard = InlineKeyboardMarkup()
-    btn_online = InlineKeyboardButton("Оплата онлайн", callback_data="pay_online")
-    btn_cash = InlineKeyboardButton("Оплата наличными", callback_data="pay_cash")
-    inline_keyboard.row(btn_online, btn_cash)
-    bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
-def process_online_payment(chat_id, user_id):
-    if user_id not in completed_orders:
-        completed_orders[user_id] = []
-    completed_orders[user_id].append(order.copy())
-    bot.send_message(chat_id, "Оплата прошла успешно! Ваш заказ оформлен.")
-    order["items"].clear()
-    order["total_price"] = 0
-
-def send_user_profile(chat_id, user_id):
-    address = user_addresses.get(user_id, "Введите адрес доставки")
-    text = f"Имя пользователя: {user_id}\nАдрес доставки: {address}"
-    inline_keyboard = InlineKeyboardMarkup()
-    btn_orders = InlineKeyboardButton("История заказов", callback_data="order_history")
-    btn_back = InlineKeyboardButton("Назад", callback_data="back_to_start")
-    inline_keyboard.row(btn_orders)
-    inline_keyboard.row(btn_back)
-    bot.send_message(chat_id, text, reply_markup=inline_keyboard)
-
-init_db()
 bot.polling(none_stop=True)
