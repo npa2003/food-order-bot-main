@@ -9,7 +9,7 @@ def add_user(telegram_id, username, first_name, last_name):
     conn.close()
 
 def get_restaurants():
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect("order_bot.db")
     cursor = conn.cursor()
     cursor.execute("SELECT name, description FROM restaurants")
     result = cursor.fetchall()

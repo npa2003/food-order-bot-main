@@ -9,10 +9,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 
-restaurants = [
-    {"name": "Ресторан №1", "logo": "https://static.tildacdn.com/tild3937-6436-4532-b065-313439633661/E9heAba_vzEory05dBFc.jpg"},
-    {"name": "Ресторан №2", "logo": "https://teremok.ru/upload/iblock/947/sI2hxnNUDVM.jpg"},
-]
+restaurants = get_restaurants()
 
 soups = [
     {"name": "Борщ", "photo": "https://aif-s3.aif.ru/images/028/368/b4e33f182b30c9ce94fca1f35f4bd2a1.jpg", "price": 250},
@@ -101,8 +98,9 @@ def send_restaurant_info(chat_id):
     inline_keyboard.row(btn_prev, btn_next)
     inline_keyboard.row(btn_select)
     inline_keyboard.row(btn_back)
-    bot.send_photo(chat_id, restaurants[current_index]["logo"], caption=restaurants[current_index]["name"],
-                   reply_markup=inline_keyboard)
+    # bot.send_photo(chat_id, restaurants[current_index]["logo"], caption=restaurants[current_index]["name"],
+#                   reply_markup=inline_keyboard)
+    bot.send_message(chat_id, restaurants[current_index]["name"], reply_markup=inline_keyboard)
 
 
 def send_menu(chat_id):
@@ -182,5 +180,5 @@ def send_user_profile(chat_id, user_id):
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
-init_db()
+#init_db()
 bot.polling(none_stop=True)
