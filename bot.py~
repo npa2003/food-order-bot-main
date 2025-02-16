@@ -106,7 +106,6 @@ def send_restaurant_info(chat_id):
 def send_menu(chat_id):
     restaurant = restaurants[current_index]["id"]
     categories = get_categories(restaurant)
-    button_names = [category["name"] for category in categories]
     inline_keyboard = InlineKeyboardMarkup()
     btn_soups = InlineKeyboardButton("Супы", callback_data="soups")
     btn_salads = InlineKeyboardButton("Салаты", callback_data="salads")
