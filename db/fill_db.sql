@@ -72,16 +72,35 @@ INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Рамен', 'Японский суп с лапшой и мясом.', 400.00, 7, 2),
 ('Мисо', 'Классический японский суп с тофу и вакамэ.', 350.00, 7, 2);
+
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Сенча', 'Зеленый японский чай в чайнике ', 400.00, 8, 2),
+('Ассам', 'Черный чай в чайнике', 250.00, 8, 2),
+('Пиво', 'Пиво Asаhi баночное', 300.00, 8, 2);
+
+
 --Блюда для ресторана "Домашний уголок" (пример 60 блюд)
 -- Категория "Супы" (id 8)
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
-('Борщ', 'Традиционный борщ со сметаной.', 250.00, 8, 3),
-('Рассольник', 'Горячий рассольник с перловкой.', 230.00, 8, 3);
+('Борщ', 'Традиционный борщ со сметаной.', 250.00, 9, 3),
+('Рассольник', 'Горячий рассольник с перловкой.', 230.00, 9, 3);
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Котлеты', 'Котлеты из говядины и свинины с пюре.', 270.00, 10, 3);
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Пельмени', 'Пельмени 20 шт со сметаной.', 400.00, 10, 3);
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Чай', 'Чай в чайнике.', 150.00, 12, 3),
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Пиво', 'Пиво Heineken разливное', 190.00, 12, 3);
+
+INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
+('Капуста', 'Капуста квашенная c яблоками по домашнемиу рецепту', 150.00, 11, 3),
+('Оливье', 'Традиционный салат с майонезом', 250.00, 11, 3);
 
 -- Категория "Десерты" (id 9)
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
-('Шарлотка', 'Классическая шарлотка с яблоками.', 200.00, 9, 3),
-('Медовик', 'Домашний торт с медом.', 220.00, 9, 3);
+('Шарлотка', 'Классическая шарлотка с яблоками.', 200.00, 13, 3),
+('Медовик', 'Домашний торт с медом.', 220.00, 13, 3);
 
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Гавайская', 'Пицца с курицей, ананасами и сыром.', 480.00, 1, 1),
