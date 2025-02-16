@@ -12,6 +12,8 @@ CREATE TABLE users (
 --2. Таблица restaurants (Рестораны)
 --Хранит данные о ресторанах, участвующих в системе.
 
+-- restaurants definition
+
 CREATE TABLE restaurants (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -19,7 +21,8 @@ CREATE TABLE restaurants (
     address TEXT,
     phone TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+, logo TEXT);
+
 --3. Таблица categories (Категории блюд)
 --Категории, к которым относятся блюда. Если меню ресторана разделено на категории (например, «Салаты», «Пицца», «Напитки»), то здесь хранятся эти разделы.
 
