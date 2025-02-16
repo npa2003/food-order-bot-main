@@ -11,10 +11,10 @@ def add_user(telegram_id, username, first_name, last_name):
 def get_restaurants():
     conn = sqlite3.connect("db/food_orders")
     cursor = conn.cursor()
-    cursor.execute("SELECT id, name, description FROM restaurants")
+    cursor.execute("SELECT id, name, description, logo FROM restaurants")
     result = cursor.fetchall()
     conn.close()
-    return [{"id": row[0], "name": row[1], "description": row[2]} for row in result]
+    return [{"id": row[0], "name": row[1], "description": row[2], "logo": row[3]} for row in result]
 
 def get_categories(restaurant_id):
     conn = sqlite3.connect("db/food_orders")
@@ -23,3 +23,11 @@ def get_categories(restaurant_id):
     result = cursor.fetchall()
     conn.close()
     return [{"id": row[0], "name": row[1]} for row in result]
+
+def get_dishes(category_id):
+    conn = sqlite3.connect("db/food_orders")
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name, price FROM dishes WHERE category_id = ?", (category_id,))
+    result = cursor.fetchall()
+    conn.close()
+    return [{"id": row[0], "name": row[1], "price": row[2]} for row in result]
