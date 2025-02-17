@@ -32,10 +32,10 @@ INSERT INTO categories (name, description, restaurant_id) VALUES
 ('Закуски', 'Лёгкие перекусы и салаты.', 3),
 ('Напитки', 'Чай, кофе и компоты.', 3),
 ('Десерты', 'Домашние сладости и выпечка.', 3);
---Заполнение таблицы dishes (200 блюд, распределённых между ресторанами и категориями)
+--Заполнение таблицы dishes (200 блюд, распределённых между ресторанами и категориями),
 --Вот несколько примеров, как можно заполнить записи для блюд (SQL-запросы реструктурированы для читаемости).
 
-Блюда для ресторана "Песто" (пример 70 блюд)
+--Блюда для ресторана "Песто" (пример 70 блюд)
 -- Категория "Пицца" (id 1)
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Маргарита', 'Классическая пицца с томатным соусом и сыром.', 450.00, 1, 1),
@@ -89,7 +89,7 @@ INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Пельмени', 'Пельмени 20 шт со сметаной.', 400.00, 10, 3);
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
-('Чай', 'Чай в чайнике.', 150.00, 12, 3),
+('Чай', 'Чай в чайнике.', 150.00, 12, 3);
 INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Пиво', 'Пиво Heineken разливное', 190.00, 12, 3);
 
@@ -191,18 +191,6 @@ INSERT INTO dishes (name, description, price, category_id, restaurant_id) VALUES
 ('Суши с белым осьминогом', 'Основа из белоснежного осьминога.', 260.00, 6, 2);
 
 
-delete from dishes where id in (
-select min(id) from dishes d group by name,category_id having count(*)>1 
-);
-
-select  r.name,c.name,count(*)  from restaurants r 
- join categories c  on c.restaurant_id= r.id
- join dishes d on d.category_id = c.id 
-group by r.name,c.name
-order by 2
-
-
- orders definition
 INSERT INTO orders (user_id, restaurant_id, status, total_cost, payment_method, comment, updated_at) VALUES
 (1, 1, 'completed', 1250.00, 'online', 'Первый заказ, пицца и паста.', DATETIME('now')),
 (1, 1, 'completed', 890.00, 'cash', 'Взял пасту и несколько роллов.', DATETIME('now')),
@@ -272,7 +260,7 @@ INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 -- Заказ 10 (user_id = 1, order_id = 10)
 INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 (10, 42, 2, 230.00, 460.00, 'Суши с угрём и авокадо');
-Заказы от второго пользователя:
+--Заказы от второго пользователя:
 -- Заказ 11 (user_id = 2, order_id = 11)
 INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 (11, 47, 2, 190.00, 380.00, 'Суши с лососем, двойная порция'),
@@ -285,7 +273,7 @@ INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 -- Заказ 13 (user_id = 2, order_id = 13)
 INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 (13, 33, 3, 160.00, 480.00, 'Тобико роллы, 3 упаковки.');
-Заказ от третьего пользователя:
+--Заказ от третьего пользователя:
 -- Заказ 14 (user_id = 3, order_id = 14)
 INSERT INTO order_items (order_id, dish_id, quantity, price, total, note) VALUES
 (14, 49, 3, 250.00, 750.00, 'Суши с красной икрой, потрясающе.');
@@ -305,7 +293,7 @@ INSERT INTO reviews (user_id, restaurant_id, order_id, rating, comment, created_
 -- Отзыв на заказ 11 из ресторана 2
 (2, 2, 11, 5, 'Суши были свежими и вкусными, доставка быстрая. Рекомендую!', DATETIME('now'));
 
-- Негативный отзыв 1 от пользователя 1 (низкая оценка на заказ из ресторана 2)
+-- Негативный отзыв 1 от пользователя 1 (низкая оценка на заказ из ресторана 2)
 INSERT INTO reviews (user_id, restaurant_id, order_id, rating, comment, created_at) VALUES
 (1, 2, 6, 1, 'Еда приехала холодной, суши были сухими. Очень разочарован.', DATETIME('now'));
 
