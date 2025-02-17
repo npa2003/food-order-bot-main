@@ -148,13 +148,13 @@ def send_category_info(chat_id):
 
 def send_cart(chat_id):
     order = get_cart(chat_id)
-    if not order[0]["dish_name"]:
+    if not order["items"]:
         bot.send_message(chat_id, "Ваша корзина пуста.")
         return
     text = "Ваш заказ:\n"
-    for dish in order:
-        text += f"{dish['dish_name']} - {dish['quantity']} шт. - {dish['total']} руб.\n"
-    text += f"\nОбщая стоимость: {sum([dish['total'] for dish in order])} руб."
+    for item in order["items"]:
+        text += f"{item['name']} - {item['price']} руб.\n"
+    text += f"\nОбщая стоимость: {order['total_price']} руб."
     inline_keyboard = InlineKeyboardMarkup()
     btn_confirm = InlineKeyboardButton("Подтвердить заказ", callback_data="confirm_order")
     btn_back = InlineKeyboardButton("Назад", callback_data="category" + "|" + str(category_id))
