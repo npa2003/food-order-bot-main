@@ -81,15 +81,13 @@ def handle_inline_buttons(call):
     elif call.data == "back_to_start":
         handle_start(call.message)
     elif call.data == "confirm_order":
+        pass
         send_payment_options(call.message.chat.id)
     elif call.data == "pay_online":
+        pass
         process_online_payment(call.message.chat.id, call.from_user.id)
     elif call.data == "profile":
         send_user_profile(call.message.chat.id, call.from_user.id)
-    elif call.data == "order_history":
-        send_user_orders(call.message.chat.id, call.from_user.id)
-    elif call.data == "pay_cash":
-        process_cash_payment(call.message.chat.id, call.from_user.id)
 
 
 def send_restaurant_info(chat_id):
@@ -213,13 +211,13 @@ def send_user_profile(chat_id, user_id):
 
 def send_user_orders(chat_id, user_id):
     user_orders = get_user_orders(user_id)
-    if not user_orders:
-        bot.send_message(chat_id, "У вас нет заказов.")
-        inline_keyboard = InlineKeyboardMarkup()
-        btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
-        inline_keyboard.add(btn_profile)
-        bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
-        return
+    # if not user_orders:
+    #     bot.send_message(chat_id, "У вас нет заказов.")
+    #     inline_keyboard = InlineKeyboardMarkup()
+    #     btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
+    #     inline_keyboard.add(btn_profile)
+    #     bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+    #     return
     text = "Ваши заказы:\n"
     for order in user_orders:
         text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
