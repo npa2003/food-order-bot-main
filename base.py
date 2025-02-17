@@ -1,6 +1,7 @@
 import sqlite3
 
 db_name = 'db/food_orders.db'
+#db_name = 'db/food_orders_01.db'
 
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
@@ -15,7 +16,9 @@ def get_restaurants():
     cursor.execute("SELECT id, name, description, logo FROM restaurants")
     result = cursor.fetchall()
     conn.close()
+    #print(result)
     return [{"id": row[0], "name": row[1], "description": row[2], "logo": row[3]} for row in result]
+
 
 def get_categories(restaurant_id):
     conn = sqlite3.connect(db_name)

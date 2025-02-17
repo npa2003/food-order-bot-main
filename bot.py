@@ -97,8 +97,15 @@ def send_restaurant_info(chat_id):
     inline_keyboard.row(btn_prev, btn_next)
     inline_keyboard.row(btn_select)
     inline_keyboard.row(btn_back)
-    bot.send_photo(chat_id, restaurants[current_index]["logo"], caption=restaurants[current_index]["name"],
-                  reply_markup=inline_keyboard)
+
+    image_path = restaurants[current_index]["logo"]
+    try:
+        with open(image_path, "rb") as image_file:
+            image_data = image_file.read()
+        bot.send_photo(chat_id, photo=image_data, caption=restaurants[current_index]["name"],
+                       reply_markup=inline_keyboard)
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
 
 
 def send_menu(chat_id):
@@ -109,8 +116,16 @@ def send_menu(chat_id):
         inline_keyboard.add(InlineKeyboardButton(button["name"], callback_data="category" + "|" + str(button["id"])))
     btn_back = InlineKeyboardButton("Назад", callback_data="choose_restaurant")
     inline_keyboard.row(btn_back)
-    bot.send_photo(chat_id, restaurants[current_index]["logo"], caption=restaurants[current_index]["name"],
-                   reply_markup=inline_keyboard)
+
+    image_path = restaurants[current_index]["logo"]
+    try:
+        with open(image_path, "rb") as image_file:
+            image_data = image_file.read()
+        bot.send_photo(chat_id, photo=image_data, caption=restaurants[current_index]["name"], reply_markup=inline_keyboard)
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+    #bot.send_photo(chat_id, image_data, caption=restaurants[current_index]["name"], reply_markup=inline_keyboard)
 
 
 def send_category_info(chat_id):
