@@ -1,7 +1,6 @@
 import sqlite3
 
 db_name = 'db/food_orders.db'
-#db_name = 'db/food_orders_01.db'
 
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
