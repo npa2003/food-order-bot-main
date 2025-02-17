@@ -1,23 +1,27 @@
 import sqlite3
 
+db_name = 'db/food_orders.db'
+#db_name = 'db/food_orders_01.db'
 
 def add_user(telegram_id, username, first_name, last_name):
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO Users (telegram_id, username, first_name, last_name) VALUES (?, ?, ?, ?)", (telegram_id, username, first_name, last_name,))
     conn.commit()
     conn.close()
 
 def get_restaurants():
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name, description, logo FROM restaurants")
     result = cursor.fetchall()
     conn.close()
+    #print(result)
     return [{"id": row[0], "name": row[1], "description": row[2], "logo": row[3]} for row in result]
 
+
 def get_categories(restaurant_id):
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name FROM categories WHERE restaurant_id = ?", (restaurant_id,))
     result = cursor.fetchall()
@@ -25,7 +29,7 @@ def get_categories(restaurant_id):
     return [{"id": row[0], "name": row[1]} for row in result]
 
 def get_dishes(category_id):
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name, price, description FROM dishes WHERE category_id = ?", (category_id,))
     result = cursor.fetchall()
@@ -34,7 +38,7 @@ def get_dishes(category_id):
 
 
 def add_to_cart(user_id, dish_id, price, restaurant_id):
-    conn = sqlite3.connect("db/food_orders")
+    conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
 
     cursor.execute("SELECT id FROM orders WHERE user_id = ? AND status = 'new'", (user_id,))
