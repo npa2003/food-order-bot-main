@@ -79,10 +79,26 @@ def get_cart(user_id):
     conn.close()
     return [{"dish_name": row[0], "quantity": row[1], "total": row[2]} for row in result]
 
-def get_order(user_id):
+
+def change_order_status(user_id, status):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, status, total_cost, payment_method, comment, updated_at FROM orders WHERE user_id = ? AND status != 'new'", (user_id,))
-    result = cursor.fetchall()
+    cursor.execute("UPDATE orders SET status = ? WHERE user_id = ? AND status = 'new' OR status = 'confirmed'", (status, user_id))
+    conn.commit()
     conn.close()
-    return [{"id": row[0], "status": row[1], "total_cost": row[2], "payment_method": row[3], "comment": row[4], "updated_at": row[5]} for row in result]
+
+def change_order_payment_method(user_id, payment_method):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE orders SET payment_method = ? WHERE user_id = ? AND status = 'new' OR status = 'confirmed'", (payment_method, user_id))
+    conn.commit()
+    conn.close()
+
+
+# def get_order(user_id):
+#     conn = sqlite3.connect(db_name)
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT id, status, total_cost, payment_method, comment, updated_at FROM orders WHERE user_id = ? AND status != 'new'", (user_id,))
+#     result = cursor.fetchall()
+#     conn.close()
+#     return [{"id": row[0], "status": row[1], "total_cost": row[2], "payment_method": row[3], "comment": row[4], "updated_at": row[5]} for row in result]
