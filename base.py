@@ -15,7 +15,6 @@ def get_restaurants():
     cursor.execute("SELECT id, name, description, logo FROM restaurants")
     result = cursor.fetchall()
     conn.close()
-    #print(result)
     return [{"id": row[0], "name": row[1], "description": row[2], "logo": row[3]} for row in result]
 
 
@@ -65,7 +64,38 @@ def add_to_cart(user_id, dish_id, price, restaurant_id):
                        (new_quantity, new_total, item[0]))
         cursor.execute("UPDATE orders SET total_cost = total_cost + ? WHERE id = ?", (price, order_id))
 
-
-
     conn.commit()
     conn.close()
+
+def get_cart(user_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT dishes.name AS dish_name, quantity, total FROM order_items "
+                   "INNER JOIN dishes ON order_items.dish_id = dishes.id "
+                   "WHERE order_id IN (SELECT id FROM orders WHERE user_id = ? AND status = 'new')", (user_id,))
+    result = cursor.fetchall()
+    conn.close()
+    return [{"dish_name": row[0], "quantity": row[1], "total": row[2]} for row in result]
+
+
+def change_order_status(user_id, status):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE orders SET status = ? WHERE user_id = ? AND status = 'new' OR status = 'confirmed'", (status, user_id))
+    conn.commit()
+    conn.close()
+
+def change_order_payment_method(user_id, payment_method):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE orders SET payment_method = ? WHERE user_id = ? AND status = 'paid' OR status = 'confirmed'", (payment_method, user_id))
+    conn.commit()
+    conn.close()
+
+def get_user_orders(user_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'new'", (user_id,))
+    result = cursor.fetchall()
+    conn.close()
+    return [{"status": row[0], "total_cost": row[1], "payment_method": row[2], "updated_at": row[3]} for row in result]
