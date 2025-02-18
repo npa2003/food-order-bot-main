@@ -55,7 +55,8 @@ def handle_inline_buttons(call):
         current_dish_index = 0
         dishes = get_dishes(category_id)
         send_category_info(call.message.chat.id)
-
+    elif call.data.isdigit():
+        print(f'Отзыв на заказ {call.data}')
     elif call.data == "choose_restaurant":
         current_index = 0
         send_restaurant_info(call.message.chat.id)
@@ -233,10 +234,19 @@ def send_user_orders(chat_id, user_id):
     bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
 def process_feedback(chat_id, user_id):
-    user_orders = get_user_orders(user_id)
-    text = "Ваши заказы:\n"
+    butts = []
+    user_orders = get_user_orders_fb(user_id)
+    print(user_orders)
+    text = "Ваши заказы, на которые можно оставить отзыв:\n"
+    num = 1
     for order in user_orders:
-        text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
+        text += f"{num}. заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
+        num += 1
     bot.send_message(chat_id, text)
+    for i in range(num):
+        butts.append(InlineKeyboardButton(text=i, callback_data=i))
+    for butt in butts:
+        inline_keyboard.add(butt)
+    bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
 bot.polling(none_stop=True)
