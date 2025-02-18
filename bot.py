@@ -90,6 +90,8 @@ def handle_inline_buttons(call):
         send_user_orders(call.message.chat.id, call.from_user.id)
     elif call.data == "pay_cash":
         process_cash_payment(call.message.chat.id, call.from_user.id)
+    elif call.data == "feedback":
+        process_feedback(call.message.chat.id, call.from_user.id)
 
 
 def send_restaurant_info(chat_id):
@@ -226,8 +228,15 @@ def send_user_orders(chat_id, user_id):
     bot.send_message(chat_id, text)
     inline_keyboard = InlineKeyboardMarkup()
     btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
-    inline_keyboard.add(btn_profile)
+    btn_fb = InlineKeyboardButton("Оставить отзыв", callback_data="feedback")
+    inline_keyboard.add(btn_profile,btn_fb)
     bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
+def process_feedback(chat_id, user_id):
+    user_orders = get_user_orders(user_id)
+    text = "Ваши заказы:\n"
+    for order in user_orders:
+        text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
+    bot.send_message(chat_id, text)
 
 bot.polling(none_stop=True)
