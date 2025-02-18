@@ -234,20 +234,29 @@ def send_user_orders(chat_id, user_id):
     bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
 def process_feedback(chat_id, user_id):
-    buttons = []
+    buttons = [] # список кнопок
+    row_butt = [] # список списков кнопок
 
     user_orders = get_user_orders_fb(user_id)
-    #print(user_orders)
     text = "Ваши заказы, на которые можно оставить отзыв:\n"
     num = 1
     for order in user_orders:
         text += f"{num}. заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
         num += 1
-    bot.send_message(chat_id, text)
-    for i in range(num-1):
-        buttons.append(InlineKeyboardButton(text=str(i+1), callback_data=str(i+1)))
+    bot.send_message(chat_id, text) # вывели список заказов
 
-    inline_keyboard = InlineKeyboardMarkup([buttons])
+    n = -1
+    for i in range(num-1):  # создаём кнопки
+        if i%6 == 0:
+            row_butt.append([])
+            n += 1
+        row_butt[n].append(InlineKeyboardButton(text=str(i+1), callback_data=str(i+1)))
+
+    inline_keyboard = InlineKeyboardMarkup(row_butt) # создаём кнопки на клавиатуре
+
+    btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
+    inline_keyboard.add(btn_profile)
+
     bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
 bot.polling(none_stop=True)
