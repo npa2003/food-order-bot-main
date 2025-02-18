@@ -90,6 +90,8 @@ def handle_inline_buttons(call):
         send_user_orders(call.message.chat.id, call.from_user.id)
     elif call.data == "pay_cash":
         process_cash_payment(call.message.chat.id, call.from_user.id)
+    elif call.data == "cancel_order":
+        cancel_order(call.message.chat.id, call.from_user.id)
 
 
 def send_restaurant_info(chat_id):
@@ -159,8 +161,10 @@ def send_cart(chat_id):
     text += f"\nОбщая стоимость: {sum([dish['total'] for dish in order])} руб."
     inline_keyboard = InlineKeyboardMarkup()
     btn_confirm = InlineKeyboardButton("Подтвердить заказ", callback_data="confirm_order")
+    btn_cancel = InlineKeyboardButton("Отменить заказ", callback_data="cancel_order")
     btn_back = InlineKeyboardButton("Назад", callback_data="category" + "|" + str(category_id))
     inline_keyboard.row(btn_confirm)
+    inline_keyboard.row(btn_cancel)
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
@@ -184,22 +188,20 @@ def send_payment_options(chat_id):
 def process_online_payment(chat_id, user_id):
     change_order_status(user_id, "paid")
     change_order_payment_method(user_id, "online")
-    bot.send_message(chat_id, "Оплата прошла успешно! Ваш заказ оформлен.")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
-    bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, "Оплата прошла успешно! Ваш заказ оформлен.", reply_markup=inline_keyboard)
 
 def process_cash_payment(chat_id, user_id):
     change_order_status(user_id, "paid")
     change_order_payment_method(user_id, "cash")
-    bot.send_message(chat_id, "Ваш заказ оформлен. Оплата наличными при получении.")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
-    bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, "Ваш заказ оформлен. Оплата наличными при получении.", reply_markup=inline_keyboard)
 
 def send_user_profile(chat_id, user_id):
     address = user_addresses.get(user_id, "Введите адрес доставки")
@@ -223,11 +225,18 @@ def send_user_orders(chat_id, user_id):
     text = "Ваши заказы:\n"
     for order in user_orders:
         text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
-    bot.send_message(chat_id, text)
     inline_keyboard = InlineKeyboardMarkup()
     btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
     inline_keyboard.add(btn_profile)
-    bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, text, reply_markup=inline_keyboard)
+
+def cancel_order(chat_id, user_id):
+    change_order_status(user_id, "canceled")
+    inline_keyboard = InlineKeyboardMarkup()
+    btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
+    btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
+    inline_keyboard.add(btn_restaurant, btn_profile)
+    bot.send_message(chat_id, "Ваш заказ отменен. Вы можете выбрать другой ресторан.", reply_markup=inline_keyboard)
 
 
 bot.polling(none_stop=True)
