@@ -86,10 +86,10 @@ def change_order_status(user_id, status):
     conn.commit()
     conn.close()
 
-def change_order_payment_method(user_id, payment_method):
+def change_order_payment_method(order_id, payment_method):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("UPDATE orders SET payment_method = ? WHERE user_id = ? AND status = 'paid' OR status = 'confirmed'", (payment_method, user_id))
+    cursor.execute("UPDATE orders SET payment_method = ? WHERE id = ? AND status = 'paid' OR status = 'confirmed'", (payment_method, order_id))
     conn.commit()
     conn.close()
 

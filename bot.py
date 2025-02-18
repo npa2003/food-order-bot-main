@@ -188,7 +188,7 @@ def send_payment_options(chat_id):
 def process_online_payment(chat_id, user_id):
     order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
-    change_order_payment_method(user_id, "online")
+    change_order_payment_method(order_id, "online")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
@@ -198,7 +198,7 @@ def process_online_payment(chat_id, user_id):
 def process_cash_payment(chat_id, user_id):
     order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
-    change_order_payment_method(user_id, "cash")
+    change_order_payment_method(order_id, "cash")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
