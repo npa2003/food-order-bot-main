@@ -55,7 +55,8 @@ def handle_inline_buttons(call):
         current_dish_index = 0
         dishes = get_dishes(category_id)
         send_category_info(call.message.chat.id)
-
+    elif call.data.isdigit():
+        print(f'Отзыв на заказ {call.data}')
     elif call.data == "choose_restaurant":
         current_index = 0
         send_restaurant_info(call.message.chat.id)
@@ -90,6 +91,8 @@ def handle_inline_buttons(call):
         send_user_orders(call.message.chat.id, call.from_user.id)
     elif call.data == "pay_cash":
         process_cash_payment(call.message.chat.id, call.from_user.id)
+    elif call.data == "feedback":
+        process_feedback(call.message.chat.id, call.from_user.id)
 
 
 def send_restaurant_info(chat_id):
@@ -206,28 +209,64 @@ def send_user_profile(chat_id, user_id):
     text = f"Имя пользователя: {user_id}\nАдрес доставки: {address}"
     inline_keyboard = InlineKeyboardMarkup()
     btn_orders = InlineKeyboardButton("История заказов", callback_data="order_history")
+    btn_fb = InlineKeyboardButton("Оставить отзыв", callback_data="feedback")
     btn_back = InlineKeyboardButton("Назад", callback_data="back_to_start")
     inline_keyboard.row(btn_orders)
+    inline_keyboard.row(btn_fb)
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
 def send_user_orders(chat_id, user_id):
     user_orders = get_user_orders(user_id)
+
     if not user_orders:
-        bot.send_message(chat_id, "У вас нет заказов.")
+        inline_keyboard = InlineKeyboardMarkup()
+        btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
+        inline_keyboard.add(btn_profile)
+        bot.send_message(chat_id, "У вас нет заказов.", reply_markup=inline_keyboard)
+    else:
+        text = "Ваши заказы:\n"
+        for order in user_orders:
+            text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
+        bot.send_message(chat_id, text)
         inline_keyboard = InlineKeyboardMarkup()
         btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
         inline_keyboard.add(btn_profile)
         bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+
+def process_feedback(chat_id, user_id):
+    buttons = [] # список кнопок
+    row_butt = [] # список списков кнопок
+
+    user_orders = get_user_orders_fb(user_id)
+
+    if not user_orders:
+        inline_keyboard = InlineKeyboardMarkup()
+        btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
+        inline_keyboard.add(btn_profile)
+        bot.send_message(chat_id, "У вас нет заказов.", reply_markup=inline_keyboard)
         return
-    text = "Ваши заказы:\n"
+
+
+    text = "Ваши заказы, на которые можно оставить отзыв:\n"
+    num = 1
     for order in user_orders:
-        text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
-    bot.send_message(chat_id, text)
-    inline_keyboard = InlineKeyboardMarkup()
+        text += f"{num}. заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
+        num += 1
+    bot.send_message(chat_id, text) # вывели список заказов
+
+    n = -1
+    for i in range(num-1):  # создаём кнопки
+        if i%6 == 0:
+            row_butt.append([])
+            n += 1
+        row_butt[n].append(InlineKeyboardButton(text=str(i+1), callback_data=str(i+1)))
+
+    inline_keyboard = InlineKeyboardMarkup(row_butt) # создаём кнопки на клавиатуре
+
     btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
     inline_keyboard.add(btn_profile)
-    bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
+    bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
 bot.polling(none_stop=True)
