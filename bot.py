@@ -15,9 +15,9 @@ dishes = {}
 current_index = 0
 current_dish_index = 0
 category_id = None
-#order = {"items": [], "total_price": 0}
 completed_orders = {}
 user_addresses = {}
+user_orders_fb = {}
 
 
 @bot.message_handler(commands=['start'])
@@ -55,44 +55,62 @@ def handle_inline_buttons(call):
         current_dish_index = 0
         dishes = get_dishes(category_id)
         send_category_info(call.message.chat.id)
+
     elif call.data.isdigit():
         print(f'Отзыв на заказ {call.data}')
+        save_feedback(call.message.chat.id, call.from_user.id, call.data)
+
     elif call.data == "choose_restaurant":
         current_index = 0
         send_restaurant_info(call.message.chat.id)
+
     elif call.data == "prev_restaurant":
         current_index = (current_index - 1) % len(restaurants)
         send_restaurant_info(call.message.chat.id)
+
     elif call.data == "next_restaurant":
         current_index = (current_index + 1) % len(restaurants)
         send_restaurant_info(call.message.chat.id)
+
     elif call.data == "select_restaurant":
         send_menu(call.message.chat.id)
+
     elif call.data == "prev_dish":
         current_dish_index = (current_dish_index - 1) % len(dishes)
         send_category_info(call.message.chat.id)
+
     elif call.data == "next_dish":
         current_dish_index = (current_dish_index + 1) % len(dishes)
         send_category_info(call.message.chat.id)
+
     elif call.data == "add_dish":
         add_to_cart(call.from_user.id, dishes[current_dish_index]["id"], dishes[current_dish_index]["price"], current_index)
         send_category_info(call.message.chat.id)
+
     elif call.data == "cart":
         send_cart(call.message.chat.id)
+
     elif call.data == "back_to_start":
         handle_start(call.message)
+
     elif call.data == "confirm_order":
         send_payment_options(call.message.chat.id)
+
     elif call.data == "pay_online":
         process_online_payment(call.message.chat.id, call.from_user.id)
+
     elif call.data == "profile":
         send_user_profile(call.message.chat.id, call.from_user.id)
+
     elif call.data == "order_history":
         send_user_orders(call.message.chat.id, call.from_user.id)
+
     elif call.data == "pay_cash":
         process_cash_payment(call.message.chat.id, call.from_user.id)
+
     elif call.data == "cancel_order":
         cancel_order(call.message.chat.id, call.from_user.id)
+
     elif call.data == "feedback":
         process_feedback(call.message.chat.id, call.from_user.id)
 
@@ -221,7 +239,7 @@ def send_user_profile(chat_id, user_id):
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
-def send_user_orders(chat_id, user_id):
+def send_user_orders(chat_id, user_id): # История заказов
     user_orders = get_user_orders(user_id)
 
     if not user_orders:
@@ -239,23 +257,23 @@ def send_user_orders(chat_id, user_id):
         inline_keyboard.add(btn_profile)
         bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
-def process_feedback(chat_id, user_id):
+def process_feedback(chat_id, user_id): # Всё для отзыва
+    global user_orders_fb
     buttons = [] # список кнопок
     row_butt = [] # список списков кнопок
 
-    user_orders = get_user_orders_fb(user_id)
+    user_orders_fb = get_user_orders_fb(user_id)
 
-    if not user_orders:
+    if not user_orders_fb:
         inline_keyboard = InlineKeyboardMarkup()
         btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
         inline_keyboard.add(btn_profile)
         bot.send_message(chat_id, "У вас нет заказов.", reply_markup=inline_keyboard)
         return
 
-
     text = "Ваши заказы, на которые можно оставить отзыв:\n"
     num = 1
-    for order in user_orders:
+    for order in user_orders_fb:
         text += f"{num}. заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
         num += 1
     bot.send_message(chat_id, text) # вывели список заказов
@@ -273,6 +291,9 @@ def process_feedback(chat_id, user_id):
     inline_keyboard.add(btn_profile)
 
     bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
+
+def save_feedback(chat_id, user_id, num): # Отзыв получаем и отправляем БД
+    bot.send_message(chat_id,f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n')
 
 def cancel_order(chat_id, user_id):
     change_order_status(user_id, "canceled")

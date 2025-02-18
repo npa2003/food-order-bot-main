@@ -95,7 +95,8 @@ def change_order_payment_method(order_id, payment_method):
 def get_user_orders(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("SELECT status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'new'", (user_id,))
+    cursor.execute("SELECT status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'new'",
+                   (user_id,))
     result = cursor.fetchall()
     conn.close()
     return [{"status": row[0], "total_cost": row[1], "payment_method": row[2], "updated_at": row[3]} for row in result]
