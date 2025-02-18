@@ -18,11 +18,11 @@ category_id = None
 completed_orders = {}
 user_addresses = {}
 user_orders_fb = {}
-fb = False
-fb_num = -1
-fb_text = ''
-fb_rate = 1000000
-b_rate = False
+b_fb = False # для обработчика текстовых, что бы понимать что пришел отзыв
+fb_num = -1  # номер заказа для отзыва в текстовом обработчике
+fb_text = '' # текст отзыва в текстовом обработчике
+fb_rate = 1000000 # оценка в текстовом обработчике
+b_rate = False # для понимания, что в текстовом обработчике сейчас обрабатывается рейтнг
 
 
 @bot.message_handler(commands=['start'])
@@ -52,8 +52,8 @@ def profile_button_handler(message):
 # Обработчик текстовых сообщений без каких-либо действий с БД, возвращаем на старт
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
-    global fb, fb_num, user_orders_fb, b_rate, fb_text, fb_rate
-    print(f'{fb}, {fb_num}')
+    global b_fb, fb_num, user_orders_fb, b_rate, fb_text, fb_rate
+    print(f'{b_fb}, {fb_num}')
 
     user_text = message.text
     user_id = message.from_user.id
@@ -61,22 +61,21 @@ def echo_all(message):
 
     print(f'Обработчик текста. {user_id}, {username}, {user_text}')
 
-    if not b_rate:
+    if (not b_rate) and b_fb:
         bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг? Это обязательно!')
         fb_text = user_text
         b_rate = True
         return
-    else:
+    elif b_rate and b_fb:
         bot.send_message(message.chat.id, 'Замечательная оценка!.\n Спасибо!')
         fb_rate = user_text
         b_rate = False
 
-    if fb:
+    if b_fb: # отзыв пора передавать на запись в БД
         add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb_rate,)  # Отправляем данные в БД [fb_num]
-        fb = False                                          # Что бы не сохранять простой текст в БД
-
-
-    handle_start(message)                                   # Переходим в самое начало
+        b_fb = False                                          # Что бы не сохранять простой текст в БД
+        b_rate = False
+        handle_start(message)                                   # Переходим в самое начало
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -330,14 +329,11 @@ def process_feedback(chat_id, user_id): # Всё для отзыва
     bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
 def ask_feedback(chat_id, user_id, num): # Отзыв получаем и отправляем БД
-    global fb
+    global b_fb
     global fb_num
     fb_num = int(num)
-    # inline_keyboard = InlineKeyboardMarkup()
-    # btn_fb = InlineKeyboardButton("Отправить", callback_data="send_fb")
-    # inline_keyboard.add(btn_fb)
     bot.send_message(chat_id, f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n') #, reply_markup=inline_keyboard)
-    fb = True
+    b_fb = True # для обработчика текстовых что бы понимать что пришел отзыв
 
 def cancel_order(chat_id, user_id):
     change_order_status(user_id, "canceled")
