@@ -18,6 +18,8 @@ category_id = None
 completed_orders = {}
 user_addresses = {}
 user_orders_fb = {}
+fb = False
+fb_num = -1
 
 
 @bot.message_handler(commands=['start'])
@@ -44,6 +46,25 @@ def handle_start(message):
 def profile_button_handler(message):
     send_user_profile(message.chat.id, message.from_user.id)
 
+# Обработчик текстовых сообщений без каких-либо действий с БД, возвращаем на старт
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    global fb, fb_num, user_orders_fb
+    print(f'{fb}, {fb_num}')
+
+    user_text = message.text
+    user_id = message.from_user.id
+    username = message.from_user.username
+
+    print(f'Обработчик текста. {user_id}, {username}, {user_text}')
+
+    if fb:
+        add_fb(message.chat.id, user_orders_fb[fb_num-1], user_text)  # Отправляем данные в БД [fb_num]
+        fb = False                                          # Что бы не сохранять простой текст в БД
+
+    bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.')
+    handle_start(message)                                   # Переходим в самое начало
+
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_inline_buttons(call):
@@ -56,9 +77,9 @@ def handle_inline_buttons(call):
         dishes = get_dishes(category_id)
         send_category_info(call.message.chat.id)
 
-    elif call.data.isdigit():
+    elif call.data.isdigit(): # отзыв на заказ
         print(f'Отзыв на заказ {call.data}')
-        save_feedback(call.message.chat.id, call.from_user.id, call.data)
+        ask_feedback(call.message.chat.id, call.from_user.id, call.data)
 
     elif call.data == "choose_restaurant":
         current_index = 0
@@ -113,6 +134,9 @@ def handle_inline_buttons(call):
 
     elif call.data == "feedback":
         process_feedback(call.message.chat.id, call.from_user.id)
+
+    elif call.data == "send_fb":
+        echo_all(call.message)
 
 
 
@@ -292,8 +316,15 @@ def process_feedback(chat_id, user_id): # Всё для отзыва
 
     bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
-def save_feedback(chat_id, user_id, num): # Отзыв получаем и отправляем БД
-    bot.send_message(chat_id,f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n')
+def ask_feedback(chat_id, user_id, num): # Отзыв получаем и отправляем БД
+    global fb
+    global fb_num
+    fb_num = int(num)
+    # inline_keyboard = InlineKeyboardMarkup()
+    # btn_fb = InlineKeyboardButton("Отправить", callback_data="send_fb")
+    # inline_keyboard.add(btn_fb)
+    bot.send_message(chat_id, f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n') #, reply_markup=inline_keyboard)
+    fb = True
 
 def cancel_order(chat_id, user_id):
     change_order_status(user_id, "canceled")

@@ -2,6 +2,7 @@ import sqlite3
 
 db_name = 'db/food_orders.db'
 
+
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -125,3 +126,12 @@ def get_user_orders_fb(user_id):
              "payment_method": row[5],
              "updated_at": row[6]}
             for row in result]
+
+def add_fb(telegram_id, data_fb, fb_text):
+    print(data_fb)
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment) VALUES (?, ?, ?, ?)",
+                    (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_text))
+    conn.commit()
+    conn.close()
