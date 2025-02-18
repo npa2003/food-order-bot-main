@@ -20,6 +20,9 @@ user_addresses = {}
 user_orders_fb = {}
 fb = False
 fb_num = -1
+fb_text = ''
+fb_rate = 1000000
+b_rate = False
 
 
 @bot.message_handler(commands=['start'])
@@ -49,7 +52,7 @@ def profile_button_handler(message):
 # Обработчик текстовых сообщений без каких-либо действий с БД, возвращаем на старт
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
-    global fb, fb_num, user_orders_fb
+    global fb, fb_num, user_orders_fb, b_rate, fb_text, fb_rate
     print(f'{fb}, {fb_num}')
 
     user_text = message.text
@@ -58,11 +61,21 @@ def echo_all(message):
 
     print(f'Обработчик текста. {user_id}, {username}, {user_text}')
 
+    if not b_rate:
+        bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг? Это обязательно!')
+        fb_text = user_text
+        b_rate = True
+        return
+    else:
+        bot.send_message(message.chat.id, 'Замечательная оценка!.\n Спасибо!')
+        fb_rate = user_text
+        b_rate = False
+
     if fb:
-        add_fb(message.chat.id, user_orders_fb[fb_num-1], user_text)  # Отправляем данные в БД [fb_num]
+        add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb,)  # Отправляем данные в БД [fb_num]
         fb = False                                          # Что бы не сохранять простой текст в БД
 
-    bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.')
+
     handle_start(message)                                   # Переходим в самое начало
 
 
