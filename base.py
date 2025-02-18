@@ -6,7 +6,7 @@ db_name = 'db/food_orders.db'
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO Users (telegram_id, username, first_name, last_name) VALUES (?, ?, ?, ?)", (telegram_id, username, first_name, last_name,))
+    cursor.execute("INSERT OR IGNORE INTO users (telegram_id, username, first_name, last_name) VALUES (?, ?, ?, ?)", (telegram_id, username, first_name, last_name,))
     conn.commit()
     conn.close()
 
@@ -100,3 +100,11 @@ def get_user_orders(user_id):
     result = cursor.fetchall()
     conn.close()
     return [{"status": row[0], "total_cost": row[1], "payment_method": row[2], "updated_at": row[3]} for row in result]
+
+def get_current_order_id(user_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM orders WHERE user_id = ? AND status = 'confirmed'", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0]

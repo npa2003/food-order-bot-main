@@ -186,22 +186,24 @@ def send_payment_options(chat_id):
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
 def process_online_payment(chat_id, user_id):
+    order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
     change_order_payment_method(user_id, "online")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
-    bot.send_message(chat_id, "Оплата прошла успешно! Ваш заказ оформлен.", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, f"Оплата прошла успешно! Ваш заказ оформлен.\n Номер вашего заказа: {order_id}", reply_markup=inline_keyboard)
 
 def process_cash_payment(chat_id, user_id):
+    order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
     change_order_payment_method(user_id, "cash")
     inline_keyboard = InlineKeyboardMarkup()
     btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
-    bot.send_message(chat_id, "Ваш заказ оформлен. Оплата наличными при получении.", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, f"Ваш заказ оформлен. Оплата наличными при получении.\n Номер вашего заказа: {order_id}", reply_markup=inline_keyboard)
 
 def send_user_profile(chat_id, user_id):
     address = user_addresses.get(user_id, "Введите адрес доставки")
