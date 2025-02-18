@@ -127,11 +127,11 @@ def get_user_orders_fb(user_id):
              "updated_at": row[6]}
             for row in result]
 
-def add_fb(telegram_id, data_fb, fb_text):
+def add_fb(telegram_id, data_fb, fb_t, fb_r):
     print(data_fb)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment) VALUES (?, ?, ?, ?)",
-                    (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_text))
+    cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment, rating) VALUES (?, ?, ?, ?, ?)",
+                    (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_t, fb_r))
     conn.commit()
     conn.close()

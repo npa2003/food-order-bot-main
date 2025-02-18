@@ -72,7 +72,7 @@ def echo_all(message):
         b_rate = False
 
     if fb:
-        add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb,)  # Отправляем данные в БД [fb_num]
+        add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb_rate,)  # Отправляем данные в БД [fb_num]
         fb = False                                          # Что бы не сохранять простой текст в БД
 
 
