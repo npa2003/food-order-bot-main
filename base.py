@@ -1,7 +1,6 @@
 import sqlite3
 
 db_name = 'db/food_orders.db'
-#db_name = 'db/food_orders_01.db'
 
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
@@ -101,6 +100,7 @@ def get_user_orders(user_id):
     conn.close()
     return [{"status": row[0], "total_cost": row[1], "payment_method": row[2], "updated_at": row[3]} for row in result]
 
+
 def get_current_order_id(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -108,3 +108,19 @@ def get_current_order_id(user_id):
     result = cursor.fetchone()
     conn.close()
     return result[0]
+
+def get_user_orders_fb(user_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, user_id, restaurant_id, status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'completed'", (user_id,))
+    result = cursor.fetchall()
+    #print(result)
+    conn.close()
+    return [{"id": row[0],
+             "user_id": row[1],
+             "restaurant_id": row[2],
+             "status": row[3],
+             "total_cost": row[4],
+             "payment_method": row[5],
+             "updated_at": row[6]}
+            for row in result]
