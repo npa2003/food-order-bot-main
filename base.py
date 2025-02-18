@@ -105,7 +105,7 @@ def get_user_orders_fb(user_id):
     cursor = conn.cursor()
     cursor.execute("SELECT id, user_id, restaurant_id, status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'completed'", (user_id,))
     result = cursor.fetchall()
-    print(result)
+    #print(result)
     conn.close()
     return [{"id": row[0],
              "user_id": row[1],
