@@ -1,6 +1,10 @@
+from datetime import datetime
+
 def print_function_name(func):
     def wrapper(*args, **kwargs):
-        print("Функция: ", func.__name__)
+        current_time = datetime.now()# Получаем текущее время
+        formatted_time = current_time.strftime("%H:%M:%S") # Форматируем и выводим текущее время
+        print(f"Функция {formatted_time}: ", func.__name__)
         return func(*args, **kwargs)
     return wrapper
 

@@ -158,6 +158,14 @@ def handle_inline_buttons(call):
     elif call.data == "send_fb":
         echo_all(call.message)
 
+    elif call.data == "add_adress":
+        add_adress(call.message.chat.id, call.from_user.id)
+
+@print_function_name
+def add_adress(chat_id, user_id):
+    print('Сейчас будем добавлять адрес в базу.')
+
+
 
 @print_function_name
 def send_restaurant_info(chat_id):
@@ -197,7 +205,6 @@ def send_menu(chat_id):
     except Exception as e:
         print(f"Произошла ошибка: {e}")
 
-    #bot.send_photo(chat_id, image_data, caption=restaurants[current_index]["name"], reply_markup=inline_keyboard)
 
 @print_function_name
 def send_category_info(chat_id):
@@ -210,18 +217,11 @@ def send_category_info(chat_id):
     inline_keyboard.row(btn_prev, btn_next)
     inline_keyboard.row(btn_add)
     inline_keyboard.row(btn_cart, btn_back)
-    # bot.send_photo(chat_id, dishes[current_dish_index]["photo"],
-    #                caption=f"{dishes[current_dish_index]['name']} - {dishes[current_dish_index]['price']} руб.",
-    #                reply_markup=inline_keyboard)
     bot.send_message(chat_id, f"{dishes[current_dish_index]['name']} - {dishes[current_dish_index]['price']} руб.\n {dishes[current_dish_index]['description']}", reply_markup=inline_keyboard)
 
 @print_function_name
 def send_cart(chat_id):
     order = get_cart(chat_id)
-    # if len(order) == 0:
-    #     bot.send_message(chat_id, "Ваша корзина пуста.")
-    #     return
-
     if not order:
         inline_keyboard = InlineKeyboardMarkup()
         btn_back = InlineKeyboardButton("Назад", callback_data="category" + "|" + str(category_id))
@@ -286,11 +286,14 @@ def process_cash_payment(chat_id, user_id):
 def send_user_profile(chat_id, user_id):
 
     adress = get_user_adr(user_id)
-    print(adress)
 
-    text = f"Имя пользователя: {user_id}\nАдрес доставки: {adress[0]}"
+    text = f"Имя пользователя: {user_id}\nАдрес доставки: {adress[0][0]}"
 
     inline_keyboard = InlineKeyboardMarkup()
+    if adress[0][0] == None:
+        btn_add_adr = InlineKeyboardButton("Добавить адрес доставки", callback_data="add_adress")
+        inline_keyboard.row(btn_add_adr)
+
     btn_orders = InlineKeyboardButton("История заказов", callback_data="order_history")
     btn_fb = InlineKeyboardButton("Оставить отзыв", callback_data="feedback")
     btn_back = InlineKeyboardButton("Назад", callback_data="back_to_start")
