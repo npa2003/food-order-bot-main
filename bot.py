@@ -114,7 +114,7 @@ def handle_inline_buttons(call):
     elif call.data == "next_dish":
         current_dish_index = (current_dish_index + 1) % len(dishes)
         send_category_info(call.message.chat.id)
- 
+
     elif call.data == "add_dish":
         add_to_cart(call.from_user.id, dishes[current_dish_index]["id"], dishes[current_dish_index]["price"], restaurants[current_index]["id"])
         send_category_info(call.message.chat.id)
