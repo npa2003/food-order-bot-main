@@ -1,4 +1,5 @@
 import telebot
+import time
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
 import os
@@ -65,17 +66,20 @@ def echo_all(message):
 
     print(f'Обработчик текста. {user_id}, {username}, {user_text}')
 
-    if (not b_rate) and b_fb:
+    if (not b_rate) and b_fb:       # сюда попадаем после написания отзыва
         bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг? Это обязательно!')
         fb_text = user_text
         b_rate = True
         return
-    elif b_rate and b_fb:
+    elif b_rate and b_fb:           # сюда попадаем после ввода рейтинга
+        if not user_text.isdigit():
+            bot.send_message(message.chat.id, 'Замечательная оценка!.\n Но нам нужны только цифры! Попробуйте ещё раз.')
+            return
         bot.send_message(message.chat.id, 'Замечательная оценка!.\n Спасибо!')
         fb_rate = user_text
         b_rate = False
 
-    if b_fb: # отзыв пора передавать на запись в БД
+    if b_fb:                        # отзыв пора передавать на запись в БД
         add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb_rate,)  # Отправляем данные в БД [fb_num]
         b_fb = False                                          # Что бы не сохранять простой текст в БД
         b_rate = False
@@ -363,4 +367,12 @@ def cancel_order(chat_id, user_id):
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(chat_id, "Ваш заказ отменен. Вы можете выбрать другой ресторан.", reply_markup=inline_keyboard)
 
-bot.polling(none_stop=True)
+
+while True:
+    try:
+        bot.polling(none_stop=True)
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+        time.sleep(15)  # Ожидание перед повторной попыткой
+
+#bot.polling(none_stop=True)
