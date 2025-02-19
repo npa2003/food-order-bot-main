@@ -3,6 +3,7 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 from dotenv import load_dotenv
 import os
 from base import *
+from test import *
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -27,8 +28,9 @@ b_rate = False # для понимания, что в текстовом обр�
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    #username = message.from_user.first_name
     print(f'{message.chat.id}, {message.from_user.id}, {message.from_user.username}')
+    print()
+
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     start_button = KeyboardButton("Старт")
     keyboard.add(start_button)
@@ -153,7 +155,7 @@ def handle_inline_buttons(call):
         echo_all(call.message)
 
 
-
+@print_function_name
 def send_restaurant_info(chat_id):
     inline_keyboard = InlineKeyboardMarkup()
     btn_prev = InlineKeyboardButton("Пред.", callback_data="prev_restaurant")
@@ -173,7 +175,7 @@ def send_restaurant_info(chat_id):
     except Exception as e:
         print(f"Произошла ошибка: {e}")
 
-
+@print_function_name
 def send_menu(chat_id):
     restaurant = restaurants[current_index]["id"]
     categories = get_categories(restaurant)
@@ -193,7 +195,7 @@ def send_menu(chat_id):
 
     #bot.send_photo(chat_id, image_data, caption=restaurants[current_index]["name"], reply_markup=inline_keyboard)
 
-
+@print_function_name
 def send_category_info(chat_id):
     inline_keyboard = InlineKeyboardMarkup()
     btn_prev = InlineKeyboardButton("Пред.", callback_data="prev_dish")
@@ -209,7 +211,7 @@ def send_category_info(chat_id):
     #                reply_markup=inline_keyboard)
     bot.send_message(chat_id, f"{dishes[current_dish_index]['name']} - {dishes[current_dish_index]['price']} руб.\n {dishes[current_dish_index]['description']}", reply_markup=inline_keyboard)
 
-
+@print_function_name
 def send_cart(chat_id):
     order = get_cart(chat_id)
     # if len(order) == 0:
@@ -236,6 +238,7 @@ def send_cart(chat_id):
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
+@print_function_name
 def send_payment_options(chat_id):
     order = get_cart(chat_id)
     if not order[0]["dish_name"]:
@@ -253,6 +256,7 @@ def send_payment_options(chat_id):
     inline_keyboard.row(btn_online, btn_cash)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
+@print_function_name
 def process_online_payment(chat_id, user_id):
     order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
@@ -263,6 +267,7 @@ def process_online_payment(chat_id, user_id):
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(chat_id, f"Оплата прошла успешно! Ваш заказ оформлен.\n Номер вашего заказа: {order_id}", reply_markup=inline_keyboard)
 
+@print_function_name
 def process_cash_payment(chat_id, user_id):
     order_id = get_current_order_id(user_id)
     change_order_status(user_id, "paid")
@@ -273,6 +278,7 @@ def process_cash_payment(chat_id, user_id):
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(chat_id, f"Ваш заказ оформлен. Оплата наличными при получении.\n Номер вашего заказа: {order_id}", reply_markup=inline_keyboard)
 
+@print_function_name
 def send_user_profile(chat_id, user_id):
     address = user_addresses.get(user_id, "Введите адрес доставки")
     text = f"Имя пользователя: {user_id}\nАдрес доставки: {address}"
@@ -285,6 +291,7 @@ def send_user_profile(chat_id, user_id):
     inline_keyboard.row(btn_back)
     bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
+@print_function_name
 def send_user_orders(chat_id, user_id): # История заказов
     user_orders = get_user_orders(user_id)
 
@@ -303,6 +310,7 @@ def send_user_orders(chat_id, user_id): # История заказов
         inline_keyboard.add(btn_profile)
         bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
 
+@print_function_name
 def process_feedback(chat_id, user_id): # Всё для отзыва
     global user_orders_fb
     buttons = [] # список кнопок
@@ -338,6 +346,7 @@ def process_feedback(chat_id, user_id): # Всё для отзыва
 
     bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
 
+@print_function_name
 def ask_feedback(chat_id, user_id, num): # Отзыв получаем и отправляем БД
     global b_fb
     global fb_num
@@ -345,6 +354,7 @@ def ask_feedback(chat_id, user_id, num): # Отзыв получаем и отп
     bot.send_message(chat_id, f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n') #, reply_markup=inline_keyboard)
     b_fb = True # для обработчика текстовых что бы понимать что пришел отзыв
 
+@print_function_name
 def cancel_order(chat_id, user_id):
     change_order_status(user_id, "canceled")
     inline_keyboard = InlineKeyboardMarkup()
