@@ -236,11 +236,10 @@ def send_user_orders(chat_id, user_id):
         text = "Ваши заказы:\n"
         for order in user_orders:
             text += f"заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
-        bot.send_message(chat_id, text)
         inline_keyboard = InlineKeyboardMarkup()
         btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
         inline_keyboard.add(btn_profile)
-        bot.send_message(chat_id, "Выберите действие:", reply_markup=inline_keyboard)
+        bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
 def process_feedback(chat_id, user_id):
     buttons = [] # список кнопок
@@ -261,7 +260,6 @@ def process_feedback(chat_id, user_id):
     for order in user_orders:
         text += f"{num}. заказ от {order['updated_at']} - {order['status']} - {order['total_cost']} руб. - {order['payment_method']}\n"
         num += 1
-    bot.send_message(chat_id, text) # вывели список заказов
 
     n = -1
     for i in range(num-1):  # создаём кнопки
@@ -274,8 +272,9 @@ def process_feedback(chat_id, user_id):
 
     btn_profile = InlineKeyboardButton("Назад", callback_data="profile")
     inline_keyboard.add(btn_profile)
+    text += "Выберете номер заказа для отзыва:"
 
-    bot.send_message(chat_id, "Выберете номер заказа для отзыва:", reply_markup=inline_keyboard)
+    bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
 def cancel_order(chat_id, user_id):
     change_order_status(user_id, "canceled")
