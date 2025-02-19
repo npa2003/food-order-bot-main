@@ -212,9 +212,17 @@ def send_category_info(chat_id):
 
 def send_cart(chat_id):
     order = get_cart(chat_id)
-    if len(order) == 0:
-        bot.send_message(chat_id, "Ваша корзина пуста.")
+    # if len(order) == 0:
+    #     bot.send_message(chat_id, "Ваша корзина пуста.")
+    #     return
+
+    if not order:
+        inline_keyboard = InlineKeyboardMarkup()
+        btn_back = InlineKeyboardButton("Назад", callback_data="category" + "|" + str(category_id))
+        inline_keyboard.row(btn_back)
+        bot.send_message(chat_id, "Ваша корзина пуста.", reply_markup=inline_keyboard)
         return
+
     text = "Ваш заказ:\n"
     for dish in order:
         text += f"{dish['dish_name']} - {dish['quantity']} шт. - {dish['total']} руб.\n"
