@@ -290,7 +290,8 @@ def process_cash_payment(chat_id, user_id):
 @print_function_name
 def send_user_profile(chat_id, user_id):
     adress = get_user_adr(user_id)
-    text = f"Имя пользователя: {user_id}\nАдрес доставки: {adress[0][0]}"
+    username = get_username(user_id)[0]
+    text = f"Имя пользователя: {username}\nАдрес доставки: {adress[0][0]}"
     inline_keyboard = InlineKeyboardMarkup()
 
     if adress[0][0] == None:

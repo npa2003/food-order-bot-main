@@ -171,3 +171,11 @@ def get_rest_fb(restaurant_id):
     result = cursor.fetchone()
     conn.close()
     return result
+
+def get_username(telegram_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users WHERE telegram_id = ?", (telegram_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
