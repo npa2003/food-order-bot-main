@@ -284,8 +284,12 @@ def process_cash_payment(chat_id, user_id):
 
 @print_function_name
 def send_user_profile(chat_id, user_id):
-    address = user_addresses.get(user_id, "Введите адрес доставки")
-    text = f"Имя пользователя: {user_id}\nАдрес доставки: {address}"
+
+    adress = get_user_adr(user_id)
+    print(adress)
+
+    text = f"Имя пользователя: {user_id}\nАдрес доставки: {adress[0]}"
+
     inline_keyboard = InlineKeyboardMarkup()
     btn_orders = InlineKeyboardButton("История заказов", callback_data="order_history")
     btn_fb = InlineKeyboardButton("Оставить отзыв", callback_data="feedback")
