@@ -13,7 +13,6 @@ def add_user(telegram_id, username, first_name, last_name):
 
 @print_function_name        # достаём адрес доставки по id
 def get_user_adr(user_id):
-    print(user_id)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT adress FROM users WHERE telegram_id = ?",(user_id,))
@@ -21,7 +20,6 @@ def get_user_adr(user_id):
     conn.close()
     print(f'Результат: {result}')
     return result
-    #return [{"id": row[0], "adress": row[1]} for row in result]
 
 @print_function_name
 def get_restaurants():

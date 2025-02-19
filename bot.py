@@ -29,18 +29,8 @@ b_rate = False # для понимания, что в текстовом обр�
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    print(f'{message.chat.id}, {message.from_user.id}, {message.from_user.username}')
-    print()
+    print(f'"/start" {message.chat.id}, {message.from_user.id}, {message.from_user.username}')
 
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    start_button = KeyboardButton("Старт")
-    keyboard.add(start_button)
-    bot.send_message(message.chat.id, "Нажмите 'Старт', чтобы начать", reply_markup=keyboard)
-
-
-@bot.message_handler(func=lambda message: message.text == "Старт")
-def handle_start(message):
-    print(f'{message.chat.id}, {message.from_user.id}, {message.from_user.username}')
     add_user(message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
     username = message.from_user.first_name
     text = f"Привет, {username}! Я бот, который поможет тебе заказать еду."
@@ -49,6 +39,15 @@ def handle_start(message):
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(message.chat.id, text, reply_markup=inline_keyboard)
+
+    # keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    # start_button = KeyboardButton("Старт")
+    # keyboard.add(start_button)
+    # bot.send_message(message.chat.id, "Нажмите 'Старт', чтобы начать", reply_markup=keyboard)
+
+# @bot.message_handler(func=lambda message: message.text == "Старт")
+# def handle_start(message):
+#     print(f'"Старт" {message.chat.id}, {message.from_user.id}, {message.from_user.username}')
 
 @bot.message_handler(func=lambda message: message.text == "Личный кабинет")
 def profile_button_handler(message):
@@ -83,7 +82,7 @@ def echo_all(message):
         add_fb(message.chat.id, user_orders_fb[fb_num-1], fb_text, fb_rate,)  # Отправляем данные в БД [fb_num]
         b_fb = False                                          # Что бы не сохранять простой текст в БД
         b_rate = False
-        handle_start(message)                                   # Переходим в самое начало
+        send_welcome(message)                                   # Переходим в самое начало
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -132,7 +131,7 @@ def handle_inline_buttons(call):
         send_cart(call.message.chat.id)
 
     elif call.data == "back_to_start":
-        handle_start(call.message)
+        send_welcome(call.message)
 
     elif call.data == "confirm_order":
         send_payment_options(call.message.chat.id)
@@ -159,11 +158,27 @@ def handle_inline_buttons(call):
         echo_all(call.message)
 
     elif call.data == "add_adress":
-        add_adress(call.message.chat.id, call.from_user.id)
+        #ask_for_text(call.message)
+        bot.send_message(call.message.chat.id, "Введите адрес доставки:")
+        bot.register_next_step_handler(call.message, process_text)   # обработчик следующего сообщения от пользователя
+
+
+# @print_function_name
+# def ask_for_text(message):
+#     bot.send_message(message.chat.id, "Введите адрес доставки:")
+#     bot.register_next_step_handler(message, process_text)
+#     add_adress(message)
 
 @print_function_name
-def add_adress(chat_id, user_id):
-    print('Сейчас будем добавлять адрес в базу.')
+def process_text(message):
+    user_text = message.text
+    bot.send_message(message.chat.id, f"Ваш адрес: {user_text} будет добавлен в базу.")
+    add_adress(user_text)
+
+
+@print_function_name
+def add_adress(adress):
+    print(f'Сейчас будем добавлять адрес {adress} в базу.')
 
 
 
