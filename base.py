@@ -11,6 +11,15 @@ def add_user(telegram_id, username, first_name, last_name):
     conn.commit()
     conn.close()
 
+@print_function_name
+def add_user_adr(id, adress):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment, rating) VALUES (?, ?, ?, ?, ?)",
+                    (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_t, fb_r))
+    conn.commit()
+    conn.close()
+
 @print_function_name        # достаём адрес доставки по id
 def get_user_adr(user_id):
     conn = sqlite3.connect(db_name)

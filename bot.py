@@ -173,12 +173,12 @@ def handle_inline_buttons(call):
 def process_text(message):
     user_text = message.text
     bot.send_message(message.chat.id, f"Ваш адрес: {user_text} будет добавлен в базу.")
-    add_adress(user_text)
+    add_adress(message.chat.id, user_text)
 
 
 @print_function_name
-def add_adress(adress):
-    print(f'Сейчас будем добавлять адрес {adress} в базу.')
+def add_adress(id, adress):
+    print(f'Сейчас будем добавлять адрес {adress} в базу.{id}')
 
 
 
