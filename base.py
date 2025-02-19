@@ -1,7 +1,9 @@
 import sqlite3
+from test import *
 
 db_name = 'db/food_orders.db'
 
+@print_function_name
 def add_user(telegram_id, username, first_name, last_name):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -9,6 +11,25 @@ def add_user(telegram_id, username, first_name, last_name):
     conn.commit()
     conn.close()
 
+@print_function_name
+def add_user_adr(id, adress):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET adress = ? WHERE telegram_id = ?", (adress, id))
+    conn.commit()
+    conn.close()
+
+@print_function_name        # достаём адрес доставки по id
+def get_user_adr(user_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT adress FROM users WHERE telegram_id = ?",(user_id,))
+    result = cursor.fetchall()
+    conn.close()
+    print(f'Результат: {result}')
+    return result
+
+@print_function_name
 def get_restaurants():
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -17,7 +38,7 @@ def get_restaurants():
     conn.close()
     return [{"id": row[0], "name": row[1], "description": row[2], "logo": row[3]} for row in result]
 
-
+@print_function_name
 def get_categories(restaurant_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -26,6 +47,7 @@ def get_categories(restaurant_id):
     conn.close()
     return [{"id": row[0], "name": row[1]} for row in result]
 
+@print_function_name
 def get_dishes(category_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -34,7 +56,7 @@ def get_dishes(category_id):
     conn.close()
     return [{"id": row[0], "name": row[1], "price": row[2], "description": row[3]} for row in result]
 
-
+@print_function_name
 def add_to_cart(user_id, dish_id, price, restaurant_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -67,6 +89,7 @@ def add_to_cart(user_id, dish_id, price, restaurant_id):
     conn.commit()
     conn.close()
 
+@print_function_name
 def get_cart(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -78,6 +101,7 @@ def get_cart(user_id):
     return [{"dish_name": row[0], "quantity": row[1], "total": row[2]} for row in result]
 
 
+@print_function_name
 def change_order_status(user_id, status):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -85,6 +109,7 @@ def change_order_status(user_id, status):
     conn.commit()
     conn.close()
 
+@print_function_name
 def change_order_payment_method(order_id, payment_method):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -92,15 +117,18 @@ def change_order_payment_method(order_id, payment_method):
     conn.commit()
     conn.close()
 
+@print_function_name
 def get_user_orders(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute("SELECT status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'new'", (user_id,))
+    cursor.execute("SELECT status, total_cost, payment_method, DATE(order_date) AS updated_at FROM orders WHERE user_id = ? AND status != 'new'",
+                   (user_id,))
     result = cursor.fetchall()
     conn.close()
     return [{"status": row[0], "total_cost": row[1], "payment_method": row[2], "updated_at": row[3]} for row in result]
 
 
+@print_function_name
 def get_current_order_id(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -109,6 +137,7 @@ def get_current_order_id(user_id):
     conn.close()
     return result[0]
 
+@print_function_name
 def get_user_orders_fb(user_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -124,3 +153,13 @@ def get_user_orders_fb(user_id):
              "payment_method": row[5],
              "updated_at": row[6]}
             for row in result]
+
+@print_function_name
+def add_fb(telegram_id, data_fb, fb_t, fb_r):
+    print(data_fb)
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment, rating) VALUES (?, ?, ?, ?, ?)",
+                    (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_t, fb_r))
+    conn.commit()
+    conn.close()
