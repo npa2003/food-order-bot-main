@@ -27,7 +27,8 @@ b_rate = False # для понимания, что в текстовом обр�
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    username = message.from_user.first_name
+    #username = message.from_user.first_name
+    print(f'{message.chat.id}, {message.from_user.id}, {message.from_user.username}')
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     start_button = KeyboardButton("Старт")
     keyboard.add(start_button)
@@ -36,6 +37,7 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: message.text == "Старт")
 def handle_start(message):
+    print(f'{message.chat.id}, {message.from_user.id}, {message.from_user.username}')
     add_user(message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
     username = message.from_user.first_name
     text = f"Привет, {username}! Я бот, который поможет тебе заказать еду."
