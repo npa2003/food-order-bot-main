@@ -157,8 +157,8 @@ def handle_inline_buttons(call):
 @print_function_name
 def process_text(message):
     user_text = message.text
-    bot.send_message(message.chat.id, f"Ваш адрес: {user_text} будет добавлен в базу.")
     add_adress(message.chat.id, user_text)
+    send_user_profile(message.chat.id, message.from_user.id)
 
 
 @print_function_name
