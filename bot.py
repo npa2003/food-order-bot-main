@@ -40,14 +40,6 @@ def send_welcome(message):
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(message.chat.id, text, reply_markup=inline_keyboard)
 
-    # keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    # start_button = KeyboardButton("Старт")
-    # keyboard.add(start_button)
-    # bot.send_message(message.chat.id, "Нажмите 'Старт', чтобы начать", reply_markup=keyboard)
-
-# @bot.message_handler(func=lambda message: message.text == "Старт")
-# def handle_start(message):
-#     print(f'"Старт" {message.chat.id}, {message.from_user.id}, {message.from_user.username}')
 
 @bot.message_handler(func=lambda message: message.text == "Личный кабинет")
 def profile_button_handler(message):
@@ -171,7 +163,7 @@ def process_text(message):
 
 @print_function_name
 def add_adress(id, adress):
-    print(f'Сейчас будем добавлять адрес {adress} в базу для пользователя {id}')
+    print(f'Пользователь {id} адрес {adress}')
     add_user_adr(id, adress)
 
 
@@ -390,4 +382,3 @@ while True:
         print(f"Произошла ошибка: {e}")
         time.sleep(15)  # Ожидание перед повторной попыткой
 
-#bot.polling(none_stop=True)
