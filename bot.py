@@ -114,9 +114,9 @@ def handle_inline_buttons(call):
     elif call.data == "next_dish":
         current_dish_index = (current_dish_index + 1) % len(dishes)
         send_category_info(call.message.chat.id)
-
+ 
     elif call.data == "add_dish":
-        add_to_cart(call.from_user.id, dishes[current_dish_index]["id"], dishes[current_dish_index]["price"], current_index)
+        add_to_cart(call.from_user.id, dishes[current_dish_index]["id"], dishes[current_dish_index]["price"], restaurants[current_index]["id"])
         send_category_info(call.message.chat.id)
 
     elif call.data == "cart":
@@ -177,12 +177,17 @@ def send_restaurant_info(chat_id):
     inline_keyboard.row(btn_prev, btn_next)
     inline_keyboard.row(btn_select)
     inline_keyboard.row(btn_back)
-
+    ratings = get_rest_fb(restaurants[current_index]["id"])
+    avg_rating = ratings[0]
+    rating_count = ratings[1]
+    text = f"Ресторан: {restaurants[current_index]['name']}\n" \
+           f"Описание: {restaurants[current_index]['description']}\n" \
+           f"Рейтинг: {avg_rating}  Отзывов: {rating_count}\n"
     image_path = restaurants[current_index]["logo"]
     try:
         with open(image_path, "rb") as image_file:
             image_data = image_file.read()
-        bot.send_photo(chat_id, photo=image_data, caption=restaurants[current_index]["name"],
+        bot.send_photo(chat_id, photo=image_data, caption=text,
                        reply_markup=inline_keyboard)
     except Exception as e:
         print(f"Произошла ошибка: {e}")

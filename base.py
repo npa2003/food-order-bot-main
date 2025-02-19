@@ -163,3 +163,11 @@ def add_fb(telegram_id, data_fb, fb_t, fb_r):
                     (telegram_id, data_fb['restaurant_id'], data_fb['id'], fb_t, fb_r))
     conn.commit()
     conn.close()
+
+def get_rest_fb(restaurant_id):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("SELECT AVG(rating), COUNT(rating) FROM reviews WHERE restaurant_id = ?", (restaurant_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
