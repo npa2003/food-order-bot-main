@@ -158,16 +158,9 @@ def handle_inline_buttons(call):
         echo_all(call.message)
 
     elif call.data == "add_adress":
-        #ask_for_text(call.message)
         bot.send_message(call.message.chat.id, "Введите адрес доставки:")
         bot.register_next_step_handler(call.message, process_text)   # обработчик следующего сообщения от пользователя
 
-
-# @print_function_name
-# def ask_for_text(message):
-#     bot.send_message(message.chat.id, "Введите адрес доставки:")
-#     bot.register_next_step_handler(message, process_text)
-#     add_adress(message)
 
 @print_function_name
 def process_text(message):
@@ -178,8 +171,8 @@ def process_text(message):
 
 @print_function_name
 def add_adress(id, adress):
-    print(f'Сейчас будем добавлять адрес {adress} в базу.{id}')
-
+    print(f'Сейчас будем добавлять адрес {adress} в базу для пользователя {id}')
+    add_user_adr(id, adress)
 
 
 @print_function_name
