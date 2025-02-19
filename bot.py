@@ -212,7 +212,7 @@ def send_category_info(chat_id):
 
 def send_cart(chat_id):
     order = get_cart(chat_id)
-    if not order[0]["dish_name"]:
+    if len(order) == 0:
         bot.send_message(chat_id, "Ваша корзина пуста.")
         return
     text = "Ваш заказ:\n"
