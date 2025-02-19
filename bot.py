@@ -284,14 +284,15 @@ def process_cash_payment(chat_id, user_id):
 
 @print_function_name
 def send_user_profile(chat_id, user_id):
-
     adress = get_user_adr(user_id)
-
     text = f"Имя пользователя: {user_id}\nАдрес доставки: {adress[0][0]}"
-
     inline_keyboard = InlineKeyboardMarkup()
+
     if adress[0][0] == None:
         btn_add_adr = InlineKeyboardButton("Добавить адрес доставки", callback_data="add_adress")
+        inline_keyboard.row(btn_add_adr)
+    else:
+        btn_add_adr = InlineKeyboardButton("Изменить адрес доставки", callback_data="add_adress")
         inline_keyboard.row(btn_add_adr)
 
     btn_orders = InlineKeyboardButton("История заказов", callback_data="order_history")
