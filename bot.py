@@ -23,7 +23,7 @@ user_orders_fb = {}
 b_fb = False # для обработчика текстовых, что бы понимать что пришел отзыв
 fb_num = -1  # номер заказа для отзыва в текстовом обработчике
 fb_text = '' # текст отзыва в текстовом обработчике
-fb_rate = 1000000 # оценка в текстовом обработчике
+fb_rate = 0 # оценка в текстовом обработчике
 b_rate = False # для понимания, что в текстовом обработчике сейчас обрабатывается рейтнг
 
 
@@ -58,13 +58,13 @@ def echo_all(message):
     print(f'Обработчик текста. {user_id}, {username}, {user_text}')
 
     if (not b_rate) and b_fb:       # сюда попадаем после написания отзыва
-        bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг? Это обязательно!')
+        bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг (от 1 до 5)? Это обязательно!')
         fb_text = user_text
         b_rate = True
         return
     elif b_rate and b_fb:           # сюда попадаем после ввода рейтинга
-        if not user_text.isdigit():
-            bot.send_message(message.chat.id, 'Замечательная оценка!.\n Но нам нужны только цифры! Попробуйте ещё раз.')
+        if not user_text.isdigit() or not 0 < int(user_text) < 6:
+            bot.send_message(message.chat.id, 'Замечательная оценка!.\n Но нам нужны только цифры (от 1 до 5)! Попробуйте ещё раз.')
             return
         bot.send_message(message.chat.id, 'Замечательная оценка!.\n Спасибо!')
         fb_rate = user_text
@@ -122,8 +122,12 @@ def handle_inline_buttons(call):
     elif call.data == "cart":
         send_cart(call.message.chat.id)
 
+    # elif call.data == "back_to_start":
+    #     send_welcome(call.message)
+
     elif call.data == "back_to_start":
-        send_welcome(call.message)
+        send_welcome_directly(call.message.chat.id, call.from_user)
+
 
     elif call.data == "confirm_order":
         send_payment_options(call.message.chat.id)
@@ -368,7 +372,7 @@ def ask_feedback(chat_id, user_id, num): # Отзыв получаем и отп
     global b_fb
     global fb_num
     fb_num = int(num)
-    bot.send_message(chat_id, f'Ну, нацарапайте чё-нить на свой заказ №{num}:\n') #, reply_markup=inline_keyboard)
+    bot.send_message(chat_id, f'Напишите пару слов как Вам понравился или нет заказ №{num}:\n') #, reply_markup=inline_keyboard)
     b_fb = True # для обработчика текстовых что бы понимать что пришел отзыв
 
 @print_function_name
@@ -379,6 +383,17 @@ def cancel_order(chat_id, user_id):
     btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
     inline_keyboard.add(btn_restaurant, btn_profile)
     bot.send_message(chat_id, "Ваш заказ отменен. Вы можете выбрать другой ресторан.", reply_markup=inline_keyboard)
+
+@print_function_name
+def send_welcome_directly(chat_id, user):
+    add_user(chat_id, user.username, user.first_name, user.last_name)
+    username = user.first_name
+    text = f"Привет, {username}! Я бот, который поможет тебе заказать еду."
+    inline_keyboard = InlineKeyboardMarkup()
+    btn_restaurant = InlineKeyboardButton("Выбрать ресторан", callback_data="choose_restaurant")
+    btn_profile = InlineKeyboardButton("Личный кабинет", callback_data="profile")
+    inline_keyboard.add(btn_restaurant, btn_profile)
+    bot.send_message(chat_id, text, reply_markup=inline_keyboard)
 
 
 while True:
