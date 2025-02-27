@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-
+# Файл логов
+log*.txt
 
 .idea/
 db/

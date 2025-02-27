@@ -26,7 +26,7 @@ def get_user_adr(user_id):
     cursor.execute("SELECT adress FROM users WHERE telegram_id = ?",(user_id,))
     result = cursor.fetchall()
     conn.close()
-    print(f'Результат: {result}')
+    #print(f'Результат: {result}')
     return result
 
 @print_function_name
@@ -156,7 +156,7 @@ def get_user_orders_fb(user_id):
 
 @print_function_name
 def add_fb(telegram_id, data_fb, fb_t, fb_r):
-    print(data_fb)
+    #print(data_fb)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO reviews (user_id, restaurant_id, order_id, comment, rating) VALUES (?, ?, ?, ?, ?)",
@@ -164,6 +164,7 @@ def add_fb(telegram_id, data_fb, fb_t, fb_r):
     conn.commit()
     conn.close()
 
+@print_function_name
 def get_rest_fb(restaurant_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
@@ -172,6 +173,7 @@ def get_rest_fb(restaurant_id):
     conn.close()
     return result
 
+@print_function_name
 def get_username(telegram_id):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()

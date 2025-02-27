@@ -27,9 +27,10 @@ fb_rate = 0 # оценка в текстовом обработчике
 b_rate = False # для понимания, что в текстовом обработчике сейчас обрабатывается рейтнг
 
 
+@print_function_name
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    print(f'"/start" {message.chat.id}, {message.from_user.id}, {message.from_user.username}')
+    #print(f'"/start" {message.chat.id}, {message.from_user.id}, {message.from_user.username}')
 
     add_user(message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name)
     username = message.from_user.first_name
@@ -41,21 +42,23 @@ def send_welcome(message):
     bot.send_message(message.chat.id, text, reply_markup=inline_keyboard)
 
 
+@print_function_name
 @bot.message_handler(func=lambda message: message.text == "Личный кабинет")
 def profile_button_handler(message):
     send_user_profile(message.chat.id, message.from_user.id)
 
 # Обработчик текстовых сообщений без каких-либо действий с БД, возвращаем на старт
+@print_function_name
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     global b_fb, fb_num, user_orders_fb, b_rate, fb_text, fb_rate
-    print(f'{b_fb}, {fb_num}')
+    #print(f'{b_fb}, {fb_num}')
 
     user_text = message.text
     user_id = message.from_user.id
     username = message.from_user.username
 
-    print(f'Обработчик текста. {user_id}, {username}, {user_text}')
+    #print(f'Обработчик текста. {user_id}, {username}, {user_text}')
 
     if (not b_rate) and b_fb:       # сюда попадаем после написания отзыва
         bot.send_message(message.chat.id, 'Спасибо! Мы обязательно передадим Ваш отзыв.\n А рейтинг (от 1 до 5)? Это обязательно!')
@@ -77,6 +80,7 @@ def echo_all(message):
         send_welcome(message)                                   # Переходим в самое начало
 
 
+@print_function_name
 @bot.callback_query_handler(func=lambda call: True)
 def handle_inline_buttons(call):
     global current_index, current_dish_index, dishes, category_id
@@ -89,7 +93,7 @@ def handle_inline_buttons(call):
         send_category_info(call.message.chat.id)
 
     elif call.data.isdigit(): # отзыв на заказ
-        print(f'Отзыв на заказ {call.data}')
+        #print(f'Отзыв на заказ {call.data}')
         ask_feedback(call.message.chat.id, call.from_user.id, call.data)
 
     elif call.data == "choose_restaurant":
@@ -401,5 +405,5 @@ while True:
         bot.polling(none_stop=True)
     except Exception as e:
         print(f"Произошла ошибка: {e}")
-        time.sleep(15)  # Ожидание перед повторной попыткой
+        time.sleep(10)  # Ожидание перед повторной попыткой
 
