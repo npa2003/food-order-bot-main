@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
+
+filename = ''
 
 def print_function_name(func):
     def wrapper(*args, **kwargs):
+        global filename
         current_time = datetime.now()# Получаем текущее время
         formatted_time = current_time.strftime("%d-%m-%y | %H:%M:%S") # Форматируем и выводим текущее время
         current_date = datetime.now().strftime("%Y-%m-%d") # Получаем текущую дату в формате ГГГГ-ММ-ДД

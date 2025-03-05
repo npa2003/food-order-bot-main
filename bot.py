@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import telebot
 import time
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
@@ -5,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from base import *
 from test import *
+from datetime import datetime
 
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
@@ -83,8 +85,16 @@ def echo_all(message):
 @print_function_name
 @bot.callback_query_handler(func=lambda call: True)
 def handle_inline_buttons(call):
-    global current_index, current_dish_index, dishes, category_id
-    bot.delete_message(call.message.chat.id, call.message.message_id)
+    global current_index, current_dish_index, dishes, category_id, filename
+
+    try:
+        # Проверяем, что сообщение можно удалить
+        if call.message.from_user.id == bot.get_me().id:  # Убедимся, что сообщение отправлено ботом
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+    except telebot.apihelper.ApiTelegramException as e:
+        with open(filename, "a", encoding="utf-8") as file:
+            file.write(f"Не удалось удалить сообщение: {e}" + "\n")  # Добавляем информацию в конец файла
+        print(f"Не удалось удалить сообщение: {e}")  # Логируем ошибку, но не прерываем выполнение
 
     if call.data.startswith("category"):
         category_id = int(call.data.split("|")[1])
@@ -402,6 +412,10 @@ def send_welcome_directly(chat_id, user):
 
 while True:
     try:
+        global filename
+        current_date = datetime.now().strftime("%Y-%m-%d") # Получаем текущую дату в формате ГГГГ-ММ-ДД
+        filename = f"log_{current_date}.txt" # Формируем имя файла
+
         bot.polling(none_stop=True)
     except Exception as e:
         print(f"Произошла ошибка: {e}")
