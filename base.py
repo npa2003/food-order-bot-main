@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 from test import *
+import os
 
-db_name = 'db/food_orders.db'
+# Указываем абсолютный путь к базе данных
+db_name = os.path.join(os.path.dirname(__file__), "db/food_orders.db")
+print (db_name)
+# db_name = 'db/food_orders.db'
 
 @print_function_name
 def add_user(telegram_id, username, first_name, last_name):
@@ -32,6 +36,7 @@ def get_user_adr(user_id):
 
 @print_function_name
 def get_restaurants():
+    print(db_name)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name, description, logo FROM restaurants")
