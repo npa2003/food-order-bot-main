@@ -4,7 +4,7 @@ from test import *
 import os
 
 # Указываем абсолютный путь к базе данных
-db_name = os.path.join(os.path.dirname(__file__), "db/food_orders.db")
+db_name = os.path.join(os.path.dirname(__file__), "db", "food_orders.db")
 print (db_name)
 # db_name = 'db/food_orders.db'
 
@@ -36,7 +36,7 @@ def get_user_adr(user_id):
 
 @print_function_name
 def get_restaurants():
-    print(db_name)
+    #print(db_name)
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name, description, logo FROM restaurants")

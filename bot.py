@@ -414,7 +414,8 @@ while True:
     try:
         global filename
         current_date = datetime.now().strftime("%Y-%m-%d") # Получаем текущую дату в формате ГГГГ-ММ-ДД
-        filename = f"log_{current_date}.txt" # Формируем имя файла
+        filename = os.path.join(os.path.dirname(__file__), f"log_{current_date}.txt")  # Формируем имя файла
+
 
         bot.polling(none_stop=True)
     except Exception as e:
